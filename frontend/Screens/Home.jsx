@@ -1,7 +1,18 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, Button } from 'react-native'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import Color from '../Color/Color'
-const Home = () => {
+import { userState } from '../Store/User/User'
+const Home = ({ navigation }) => {
+  const setUser = useSetRecoilState(userState)
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('@account')
+    setUser({})
+    navigation.navigate('NotAuth')
+  }
+
   return (
     <View
       style={{
@@ -9,7 +20,7 @@ const Home = () => {
         flex: 1
       }}
     >
-      <Text>asdqwqwfqfasf</Text>
+      <Button title="log out" onPress={handleLogout}></Button>
     </View>
   )
 }

@@ -1,124 +1,72 @@
 import {
-  Alert,
   Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  Keyboard,
-  Modal
+  View
 } from 'react-native'
-
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 //color
 import Color from '../Color/Color'
 //logo
-import Logo from '../Constants/Logo'
+// import Logo from '../Constants/Logo'
+const Logo = require('../assets/Logo/logo.png')
 //papper UI
-import { ActivityIndicator, Button } from 'react-native-paper'
+import { Button } from 'react-native-paper'
 //icon
 import { AntDesign } from '@expo/vector-icons'
 import { FontAwesome } from '@expo/vector-icons'
 import { Ionicons } from '@expo/vector-icons'
 //Formik
 import { Formik } from 'formik'
-//validate
-import * as yup from 'yup'
 //keyboad avoid
 import KeyboardAvoidingWrapper from '../Components/KeyboardAvoidingWrapper/KeyboardAvoidingWrapper'
-//api
-import FakeAuth from '../Api/FakeAuth'
-//asyncstore
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSetRecoilState } from 'recoil'
-import { userAuthState, userState } from '../Store/User/User'
-//encode password
-import { SHA256 } from '../Utils/SHA256'
-const schema = yup.object({
-  email: yup
-    .string()
-    .required('Oops! You must enter Email')
-    .email("Oops! Email isn't valid"),
-  password: yup
-    .string()
-    .required('Please enter Password')
-    .min(6, 'Password length must be more than 6')
-})
-
-const Login = ({ navigation }) => {
-  const setUser = useSetRecoilState(userState)
-  const refInput2 = useRef()
-  const [modalVisible, setModalVisible] = useState(false)
-  // handleSubmit form login
-  const handleSubmitLogin = async (values, actions) => {
-    setModalVisible(true)
-    const { email, password } = values
-    const account = await FakeAuth.loginApi(
-      email.trim(),
-      SHA256(password.trim())
-    )
-    if (account) {
-      try {
-        const { user } = account.payload
-        const jsonAccount = JSON.stringify(account)
-        await AsyncStorage.setItem('@account', jsonAccount)
-        setUser(user)
-        setModalVisible(false)
-        Keyboard.dismiss()
-        actions.resetForm()
-        navigation.navigate('Auth')
-      } catch (e) {}
-    } else {
-      Alert.alert(
-        'Sign in Failed',
-        'Please check again your Email or Password',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setModalVisible(false)
-            }
-          }
-        ]
-      )
-    }
+import { useRecoilValue } from 'recoil'
+import { userState } from '../Store/User/User'
+const Register = ({ navigation }) => {
+  // handleSubmit form register
+  const handleSubmitRegister = values => {
+    console.log(values)
   }
+  //ref to next input
+  const refInput2 = useRef()
+  const refInput3 = useRef()
 
   return (
     <KeyboardAvoidingWrapper>
-      <View style={styles.loginBoxRoot}>
-        <View style={styles.loginBox}>
+      <View style={styles.registerBoxRoot}>
+        <View style={styles.registerBox}>
           <View>
-            <Image style={styles.loginLogo} source={Logo} />
+            <Image style={styles.registerLogo} source={Logo} />
           </View>
           <View>
-            <Text style={styles.loginTitle}>
+            <Text style={styles.registerTitle}>
               F<Text style={styles.titleO1}>o</Text>
               <Text style={styles.titleO2}>o</Text>dChi
             </Text>
           </View>
           <View>
-            <Text style={styles.LoginSignIn}>Sign in</Text>
+            <Text style={styles.registerSignIn}>Sign up</Text>
           </View>
-          {/* login with other */}
-          <View style={styles.LoginBoxOther}>
+          {/* register with other */}
+          <View style={styles.registerBoxOther}>
             <TouchableOpacity activeOpacity={0.8}>
               <Button
                 mode="contained"
                 uppercase={false}
                 color={Color.$btnOrange}
-                style={styles.loginBtnGoogle}
-                labelStyle={styles.loginBtnGoogleLabel}
+                style={styles.registerBtnGoogle}
+                labelStyle={styles.registerBtnGoogleLabel}
               >
                 <AntDesign name="google" size={17} color="white" />{' '}
-                <Text style={styles.loginBtnOtherText}>With Google</Text>
+                <Text style={styles.registerBtnOtherText}>With Google</Text>
               </Button>
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5}>
-              <Button style={styles.loginBtnSocial}>
+              <Button style={styles.registerBtnSocial}>
                 <FontAwesome
-                  style={styles.loginBtnSocialIcon}
+                  style={styles.registerBtnSocialIcon}
                   name="facebook-f"
                   size={17}
                   color="black"
@@ -126,10 +74,10 @@ const Login = ({ navigation }) => {
               </Button>
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5}>
-              <Button style={styles.loginBtnSocial}>
+              <Button style={styles.registerBtnSocial}>
                 <Ionicons
                   name="ios-logo-twitter"
-                  style={styles.loginBtnSocialIcon}
+                  style={styles.registerBtnSocialIcon}
                   size={17}
                   color="black"
                 />
@@ -137,18 +85,17 @@ const Login = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View>
-            <Text style={styles.loginTextEmail}>Or with Email</Text>
+            <Text style={styles.registerTextEmail}>Or with Email</Text>
           </View>
-          {/* login with email */}
+          {/* register with email */}
           <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={schema}
-            onSubmit={(values, actions) => {
-              handleSubmitLogin(values, actions)
+            initialValues={{ email: '', password: '', repassword: '' }}
+            onSubmit={values => {
+              handleSubmitRegister(values)
             }}
           >
-            {({ handleChange, values, handleSubmit, touched, errors }) => (
-              <View style={styles.loginForm}>
+            {({ handleChange, values, handleSubmit }) => (
+              <View style={styles.registerForm}>
                 <TextInput
                   style={styles.inputText}
                   placeholder="Email"
@@ -159,9 +106,6 @@ const Login = ({ navigation }) => {
                     refInput2.current.focus()
                   }}
                 />
-                <Text style={styles.errors}>
-                  {touched.email && errors.email}
-                </Text>
                 <TextInput
                   style={styles.inputText}
                   placeholder="Password"
@@ -170,20 +114,29 @@ const Login = ({ navigation }) => {
                   onChangeText={handleChange('password')}
                   value={values.password}
                   ref={refInput2}
+                  onSubmitEditing={() => {
+                    refInput3.current.focus()
+                  }}
+                />
+                <TextInput
+                  style={styles.inputText}
+                  placeholder="Re-Password"
+                  keyboardType="default"
+                  secureTextEntry={true}
+                  onChangeText={handleChange('repassword')}
+                  value={values.repassword}
+                  ref={refInput3}
                   onSubmitEditing={handleSubmit}
                 />
-                <Text style={styles.errors}>
-                  {touched.password && errors.password}
-                </Text>
                 <TouchableOpacity activeOpacity={0.5}>
                   <Button
-                    style={styles.btnLogin}
-                    labelStyle={styles.btnLoginLabel}
+                    style={styles.btnRegister}
+                    labelStyle={styles.btnRegisterLabel}
                     mode="contained"
                     onPress={handleSubmit}
                     uppercase={false}
                   >
-                    Sign in
+                    Sign up
                   </Button>
                 </TouchableOpacity>
               </View>
@@ -191,64 +144,47 @@ const Login = ({ navigation }) => {
           </Formik>
           {/* Register */}
 
-          <View style={styles.regiterWrapper}>
-            <Text style={styles.regiterUser}>New User?</Text>
+          <View style={styles.loginWrapper}>
+            <Text style={styles.loginUser}>Aready a Member?</Text>
             <TouchableOpacity activeOpacity={0.5}>
               <Text
-                onPress={() => navigation.navigate('Register')}
-                style={styles.regiterSignup}
+                onPress={() => navigation.navigate('Login')}
+                style={styles.loginSignin}
               >
-                Sign up
+                Sign in
               </Text>
             </TouchableOpacity>
           </View>
         </View>
-        {/* modal loading */}
-        <Modal transparent={true} animationType="fade" visible={modalVisible}>
-          <View style={styles.modal}>
-            <ActivityIndicator
-              animating={true}
-              color={Color.$textBasicLight}
-              size={35}
-            />
-          </View>
-        </Modal>
       </View>
     </KeyboardAvoidingWrapper>
   )
 }
 
-export default Login
+export default Register
 
 const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  btnLogin: {
-    marginTop: 25,
+  btnRegister: {
+    marginTop: 15,
     backgroundColor: Color.$btnGreen,
     borderRadius: 15,
     justifyContent: 'center'
   },
-  btnLoginLabel: {
+  btnRegisterLabel: {
     fontFamily: 'Poppins-medium',
     fontSize: 17,
     paddingVertical: 1
   },
-  errors: {
-    height: 15,
-    marginVertical: 1,
-    paddingLeft: 10,
-    color: '#ff4d4f',
-    fontSize: 11
-  },
-  loginBoxRoot: {
+  registerBoxRoot: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Color.$backgroundLight
   },
-  loginBox: {
+  registerBox: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -259,66 +195,60 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50
     // bottom: 150
   },
-  LoginBoxOther: {
+  registerBoxOther: {
     marginTop: 15,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center'
   },
-  loginBtnSocial: {
+  registerBtnSocial: {
     borderRadius: 15,
     borderWidth: 1,
     borderColor: Color.$textBasicLight,
     minWidth: 50,
     marginLeft: 15
   },
-  loginBtnSocialIcon: {
+  registerBtnSocialIcon: {
     color: Color.$textBasicLight
   },
-  loginBtnGoogle: {
+  registerBtnGoogle: {
     borderRadius: 15,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 2
   },
-  loginBtnGoogleLabel: {
+  registerBtnGoogleLabel: {
     color: Color.$textBasicWhite,
     fontFamily: 'Poppins-medium'
   },
-  loginBtnOtherText: {
+  registerBtnOtherText: {
     fontSize: 13
   },
-  loginForm: {
+  registerForm: {
     marginTop: 25
   },
-  loginLogo: {
+  registerLogo: {
     width: 120,
     height: 120,
     overflow: 'visible'
   },
-  loginTitle: {
+  registerTitle: {
     fontSize: 40,
     fontFamily: 'Poppins-medium',
     color: Color.$textBasicLight
   },
-  LoginSignIn: {
+  registerSignIn: {
     fontSize: 30,
     fontFamily: 'Poppins-bold',
     color: Color.$textBasicLight,
     marginTop: 20
   },
-  loginTextEmail: {
+  registerTextEmail: {
     fontFamily: 'Poppins-regular',
     color: Color.$textBasicLight,
     fontSize: 13,
     marginTop: 25
-  },
-  modal: {
-    backgroundColor: 'rgba(0, 0, 0,0.2)',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   titleO1: {
     fontFamily: 'Poppins-bold',
@@ -344,21 +274,21 @@ const styles = StyleSheet.create({
     minHeight: 45,
     borderRadius: 15,
     fontFamily: 'Poppins-medium',
-    // marginVertical: 5,
+    marginBottom: 15,
     paddingLeft: 10,
     fontSize: 15
   },
-  regiterSignup: {
+  loginSignin: {
     fontFamily: 'Poppins-medium',
     color: Color.$textGreen
   },
-  regiterUser: {
+  loginUser: {
     fontFamily: 'Poppins-medium',
     color: Color.$textBasicLight,
     marginRight: 3
   },
-  regiterWrapper: {
-    marginTop: 70,
+  loginWrapper: {
+    marginTop: 50,
     flexDirection: 'row'
   }
 })

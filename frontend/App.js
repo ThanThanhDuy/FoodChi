@@ -1,14 +1,9 @@
-import { StatusBar } from 'expo-status-bar'
-import React, { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import TabRoutes from './Routes/Tab/TabRoutes'
-import Home from './Screens/Home'
-import { NavigationContainer } from '@react-navigation/native'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import Favorite from './Screens/Favorite'
-import Login from './Screens/Login'
-
 import { useFonts } from 'expo-font'
+import { StatusBar } from 'expo-status-bar'
+import React from 'react'
+import { StyleSheet, View } from 'react-native'
+import { RecoilRoot } from 'recoil'
+import Routes from './Routes/Routes'
 
 export default function App() {
   const [loaded] = useFonts({
@@ -16,10 +11,22 @@ export default function App() {
     'Poppins-bold': require('./assets/Font/Poppins-Bold.ttf'),
     'Poppins-medium': require('./assets/Font/Poppins-Medium.ttf')
   })
+
   if (!loaded) {
     return null
   }
-  return <Login />
+  return (
+    <RecoilRoot>
+      <View style={styles.root}>
+        <Routes />
+        <StatusBar barStyle="light-content" />
+      </View>
+    </RecoilRoot>
+  )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  root: {
+    flex: 1
+  }
+})
